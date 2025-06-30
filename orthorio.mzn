@@ -204,21 +204,17 @@ constraint forall (a in 1..AGENTS) (next[path(a, End)] == path(a mod AGENTS + 1,
 
 % Tunnel entrances are followed by a non-empty tile.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
-  let {
-    set of SB: notNS = SB diff {SB_None, SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S};
-    set of SB: notWE = SB diff {SB_None, SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W};
-  } in
-  if     sb(y, x) == SB_TI_N then 1 < y      /\ sb(y - 1, x    ) in notNS
-  elseif sb(y, x) == SB_TI_S then y < HEIGHT /\ sb(y + 1, x    ) in notNS
-  elseif sb(y, x) == SB_TI_W then 1 < x      /\ sb(y    , x - 1) in notWE
-  elseif sb(y, x) == SB_TI_E then x < WIDTH  /\ sb(y    , x + 1) in notWE endif);
+  if     sb(y, x) == SB_TI_N then 1 < y      /\ sb(y - 1, x    ) in SB diff {SB_None, SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S}
+  elseif sb(y, x) == SB_TI_S then y < HEIGHT /\ sb(y + 1, x    ) in SB diff {SB_None, SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S}
+  elseif sb(y, x) == SB_TI_W then 1 < x      /\ sb(y    , x - 1) in SB diff {SB_None, SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W}
+  elseif sb(y, x) == SB_TI_E then x < WIDTH  /\ sb(y    , x + 1) in SB diff {SB_None, SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W} endif);
 
 % Tunnel exits are preceded by a non-empty tile.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
-  if     sb(y, x) == SB_TO_S then 1 < y      /\ sb(y - 1, x    ) != SB_None
-  elseif sb(y, x) == SB_TO_N then y < HEIGHT /\ sb(y + 1, x    ) != SB_None
-  elseif sb(y, x) == SB_TO_E then 1 < x      /\ sb(y    , x - 1) != SB_None
-  elseif sb(y, x) == SB_TO_W then x < WIDTH  /\ sb(y    , x + 1) != SB_None endif);
+  if     sb(y, x) == SB_TO_S then 1 < y      /\ sb(y - 1, x    ) in SB diff {SB_None, SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S}
+  elseif sb(y, x) == SB_TO_N then y < HEIGHT /\ sb(y + 1, x    ) in SB diff {SB_None, SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S}
+  elseif sb(y, x) == SB_TO_E then 1 < x      /\ sb(y    , x - 1) in SB diff {SB_None, SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W}
+  elseif sb(y, x) == SB_TO_W then x < WIDTH  /\ sb(y    , x + 1) in SB diff {SB_None, SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W} endif);
 
 % ----------------------
 %         Goal
