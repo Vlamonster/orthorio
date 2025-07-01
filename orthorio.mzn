@@ -50,19 +50,18 @@ type Node = record (int: y, int: x, string: d);
 array[1..NODES] of var SB: sb;
 array[1..NODES] of var 0..AGENTS: sba;
 array[1..NODES] of var 1..NODES: next;
-array[1..NODES] of var 1..NODES: prev;
 
 % ----------------------
 %       Functions
 % ----------------------
 
-function int: index(int: y, int: x) =
-  (y - 1) * WIDTH + x;
+function 0..NODES: index(int: y, int: x) =
+  if 0 < y /\ y < HEIGHT + 1 /\ 0 < x /\ x < WIDTH + 1 then (y - 1) * WIDTH + x else 0 endif;
 
-function var int: x(var int: n) =
+function var 1..WIDTH: x(var int: n) =
   (n - 1) mod WIDTH + 1;
 
-function var int: y(var int: n) =
+function var 1..HEIGHT: y(var int: n) =
   (n - 1) div WIDTH + 1;
 
 function var SB: sb(int: y, int: x) =
@@ -82,9 +81,6 @@ function 0..AGENTS: ends(int: y, int: x) =
 
 function var 1..NODES: next(int: y, int: x) =
   next[index(y, x)];
-
-function var 1..NODES: prev(int: y, int: x) =
-  prev[index(y, x)];
 
 % ----------------------
 %   Global Constraints
@@ -111,23 +107,38 @@ constraint forall (a in 1..AGENTS, m in Marker) (
 % Channeling Constraints
 % ----------------------
 
-% Next and previous are inverses.
-constraint inverse(next, prev);
-
 % Empty cells point at themselves.
 constraint forall (n in 1..NODES) (sb[n] == SB_None <-> next[n] == n);
 
 % Next agrees with surface belt placement.
-constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y,x) = 0) (
-  if     sb(y, x) == SB_None then               next(y, x) == index(y    , x    )
-  elseif sb(y, x) == SB_N    then 1 < y      /\ next(y, x) == index(y - 1, x    )
-  elseif sb(y, x) == SB_S    then y < HEIGHT /\ next(y, x) == index(y + 1, x    )
-  elseif sb(y, x) == SB_W    then 1 < x      /\ next(y, x) == index(y    , x - 1)
-  elseif sb(y, x) == SB_E    then x < WIDTH  /\ next(y, x) == index(y    , x + 1)
-  elseif sb(y, x) == SB_TO_N then 1 < y      /\ next(y, x) == index(y - 1, x    )
-  elseif sb(y, x) == SB_TO_S then y < HEIGHT /\ next(y, x) == index(y + 1, x    )
-  elseif sb(y, x) == SB_TO_W then 1 < x      /\ next(y, x) == index(y    , x - 1)
-  elseif sb(y, x) == SB_TO_E then x < WIDTH  /\ next(y, x) == index(y    , x + 1) endif);
+constraint forall(y in 1..HEIGHT, x in 1..WIDTH where ends(y,x) = 0)
+  (table(
+    [enum2int(sb(y, x)), next(y, x)],
+    [|enum2int(SB_None), index(y    , x    )
+     |enum2int(   SB_N), index(y - 1, x    )
+     |enum2int(   SB_S), index(y + 1, x    )
+     |enum2int(   SB_W), index(y    , x - 1)
+     |enum2int(   SB_E), index(y    , x + 1)
+     |enum2int(SB_TO_N), index(y - 1, x    )
+     |enum2int(SB_TO_S), index(y + 1, x    )
+     |enum2int(SB_TO_W), index(y    , x - 1)
+     |enum2int(SB_TO_E), index(y    , x + 1)
+     |enum2int(SB_TI_N), index(y - 2, x    )
+     |enum2int(SB_TI_N), index(y - 3, x    )
+     |enum2int(SB_TI_N), index(y - 4, x    )
+     |enum2int(SB_TI_S), index(y - 5, x    )
+     |enum2int(SB_TI_S), index(y + 2, x    )
+     |enum2int(SB_TI_S), index(y + 3, x    )
+     |enum2int(SB_TI_S), index(y + 4, x    )
+     |enum2int(SB_TI_S), index(y + 5, x    )
+     |enum2int(SB_TI_W), index(y    , x - 2)
+     |enum2int(SB_TI_W), index(y    , x - 3)
+     |enum2int(SB_TI_W), index(y    , x - 4)
+     |enum2int(SB_TI_W), index(y    , x - 5)
+     |enum2int(SB_TI_E), index(y    , x + 2)
+     |enum2int(SB_TI_E), index(y    , x + 3)
+     |enum2int(SB_TI_E), index(y    , x + 4)
+     |enum2int(SB_TI_E), index(y    , x + 5)|]));
 
 % ----------------------
 %   Agent Constraints
@@ -149,26 +160,47 @@ constraint forall (n in 1..NODES where ends[n] != 0) (sba[n] == ends[n]);
 %   Tunnel Constraints
 % ----------------------
 
-% Enforce tunnel entrance connects to tunnel exit.
-constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
-  if     sb(y, x) == SB_TI_N then sb[next(y, x)] == SB_TO_N
-  elseif sb(y, x) == SB_TI_S then sb[next(y, x)] == SB_TO_S
-  elseif sb(y, x) == SB_TI_W then sb[next(y, x)] == SB_TO_W
-  elseif sb(y, x) == SB_TI_E then sb[next(y, x)] == SB_TO_E endif);
-
-% Enforce tunnel entrance connects to tunnel exit.
-constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
-  if     sb(y, x) == SB_TO_N then sb[prev(y, x)] == SB_TI_N
-  elseif sb(y, x) == SB_TO_S then sb[prev(y, x)] == SB_TI_S
-  elseif sb(y, x) == SB_TO_W then sb[prev(y, x)] == SB_TI_W
-  elseif sb(y, x) == SB_TO_E then sb[prev(y, x)] == SB_TI_E endif);
-
-% Enforce tunnel length is between 3 and 6.
-constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
-  if     sb(y, x) == SB_TI_N then x(next(y, x)) == x /\ y - 6 < y(next(y, x)) /\ y(next(y, x)) < y - 1
-  elseif sb(y, x) == SB_TI_S then x(next(y, x)) == x /\ y + 1 < y(next(y, x)) /\ y(next(y, x)) < y + 6
-  elseif sb(y, x) == SB_TI_W then y(next(y, x)) == y /\ x - 6 < x(next(y, x)) /\ x(next(y, x)) < x - 1
-  elseif sb(y, x) == SB_TI_E then y(next(y, x)) == y /\ x + 1 < x(next(y, x)) /\ x(next(y, x)) < x + 6 endif);
+% Enforce belt to belt transitions are valid.
+constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0)
+  (table(
+    [enum2int(sb[index(y, x)]), enum2int(sb[next(y, x)])],
+    [|enum2int(SB_TI_N), enum2int(SB_TO_N)
+     |enum2int(SB_TI_S), enum2int(SB_TO_S)
+     |enum2int(SB_TI_W), enum2int(SB_TO_W)
+     |enum2int(SB_TI_E), enum2int(SB_TO_E)
+     |enum2int(   SB_N), enum2int(   SB_N)
+     |enum2int(   SB_N), enum2int(   SB_W)
+     |enum2int(   SB_N), enum2int(   SB_E)
+     |enum2int(   SB_N), enum2int(SB_TI_N)
+     |enum2int(   SB_S), enum2int(   SB_S)
+     |enum2int(   SB_S), enum2int(   SB_W)
+     |enum2int(   SB_S), enum2int(   SB_E)
+     |enum2int(   SB_S), enum2int(SB_TI_S)
+     |enum2int(   SB_W), enum2int(   SB_N)
+     |enum2int(   SB_W), enum2int(   SB_S)
+     |enum2int(   SB_W), enum2int(   SB_W)
+     |enum2int(   SB_W), enum2int(SB_TI_W)
+     |enum2int(   SB_E), enum2int(   SB_N)
+     |enum2int(   SB_E), enum2int(   SB_S)
+     |enum2int(   SB_E), enum2int(   SB_E)
+     |enum2int(   SB_E), enum2int(SB_TI_E)
+     |enum2int(SB_TO_N), enum2int(   SB_N)
+     |enum2int(SB_TO_N), enum2int(   SB_W)
+     |enum2int(SB_TO_N), enum2int(   SB_E)
+     |enum2int(SB_TO_N), enum2int(SB_TI_N)
+     |enum2int(SB_TO_S), enum2int(   SB_S)
+     |enum2int(SB_TO_S), enum2int(   SB_W)
+     |enum2int(SB_TO_S), enum2int(   SB_E)
+     |enum2int(SB_TO_S), enum2int(SB_TI_S)
+     |enum2int(SB_TO_W), enum2int(   SB_N)
+     |enum2int(SB_TO_W), enum2int(   SB_S)
+     |enum2int(SB_TO_W), enum2int(   SB_W)
+     |enum2int(SB_TO_W), enum2int(SB_TI_W)
+     |enum2int(SB_TO_E), enum2int(   SB_N)
+     |enum2int(SB_TO_E), enum2int(   SB_S)
+     |enum2int(SB_TO_E), enum2int(   SB_E)
+     |enum2int(SB_TO_E), enum2int(SB_TI_E)
+     |enum2int(SB_None), enum2int(SB_None)|]));
 
 % Enforce tunnel entrances are preceded by a node facing into them.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
@@ -188,20 +220,6 @@ constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
   elseif sb(y, x) == SB_TI_W then forall (xx in x(next(y, x)) + 1..x - 1) (sb( y, xx) in notWE)
   elseif sb(y, x) == SB_TI_E then forall (xx in x + 1..x(next(y, x)) - 1) (sb( y, xx) in notWE) endif);
 
-% ----------------------
-% Subcircuit Constraints
-% ----------------------
-
-% All starts are path of the subcircuit.
-constraint forall (a in 1..AGENTS) (next[path(a, Start)] != path(a, Start));
-
-% All ends connect to the start of the next agent.
-constraint forall (a in 1..AGENTS) (next[path(a, End)] == path(a mod AGENTS + 1, Start));
-
-% ----------------------
-%   Style Constraints
-% ----------------------
-
 % Tunnel entrances are followed by a non-empty tile.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
   if     sb(y, x) == SB_TI_N then 1 < y      /\ sb(y - 1, x    ) in SB diff {SB_None, SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S}
@@ -215,6 +233,45 @@ constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
   elseif sb(y, x) == SB_TO_N then y < HEIGHT /\ sb(y + 1, x    ) in SB diff {SB_None, SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S}
   elseif sb(y, x) == SB_TO_E then 1 < x      /\ sb(y    , x - 1) in SB diff {SB_None, SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W}
   elseif sb(y, x) == SB_TO_W then x < WIDTH  /\ sb(y    , x + 1) in SB diff {SB_None, SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W} endif);
+
+% ----------------------
+% Subcircuit Constraints
+% ----------------------
+
+% All starts are path of the subcircuit.
+constraint forall (a in 1..AGENTS) (next[path(a, Start)] != path(a, Start));
+
+% All ends connect to the start of the next agent.
+constraint forall (a in 1..AGENTS) (next[path(a, End)] == path(a mod AGENTS + 1, Start));
+
+% ----------------------
+% No shortcut Constraints
+% ----------------------
+
+array[1..16, 1..4] of SB: pattern =
+ [| SB_S, SB_E, SB_E, SB_N
+  | SB_N, SB_S, SB_N, SB_W
+  | SB_S, SB_N, SB_E, SB_N
+  | SB_W, SB_S, SB_N, SB_W
+  | SB_S, SB_W, SB_W, SB_N
+  | SB_E, SB_S, SB_N, SB_S
+  | SB_S, SB_W, SB_S, SB_N
+  | SB_E, SB_S, SB_N, SB_E
+  | SB_S, SB_W, SB_E, SB_S
+  | SB_E, SB_E, SB_N, SB_W
+  | SB_S, SB_W, SB_E, SB_E
+  | SB_E, SB_N, SB_N, SB_W
+  | SB_N, SB_W, SB_E, SB_N
+  | SB_E, SB_S, SB_W, SB_W
+  | SB_W, SB_W, SB_E, SB_N
+  | SB_E, SB_S, SB_S, SB_W
+  |];
+
+constraint forall(y in 1..HEIGHT-1, x in 1..WIDTH-1)
+                 (let { array[1..4] of var SB: block =
+                        [ sb(y,x), sb(y,x+1), sb(y+1,x), sb(y+1,x+1) ]; } in
+                  forall(p in 1..16)
+                        (exists(i in 1..4)(block[i] != pattern[p,i])));
 
 % ----------------------
 %         Goal
