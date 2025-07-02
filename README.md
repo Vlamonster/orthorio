@@ -15,7 +15,7 @@ Level 1.1 (OPTIMAL):
 43
 ==========
 ```
-Level 1.2 (Lower Bound = 77)
+Level 1.2 (Lower Bound = 78)
 ```
        ┌┐  
 ──┐  ┌═│║═─
