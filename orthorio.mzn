@@ -129,7 +129,7 @@ constraint forall(y in 1..HEIGHT, x in 1..WIDTH where ends(y,x) = 0)
      |enum2int(SB_TI_N), y - 2        , x
      |enum2int(SB_TI_N), y - 3        , x
      |enum2int(SB_TI_N), y - 4        , x
-     |enum2int(SB_TI_S), y - 5        , x
+     |enum2int(SB_TI_N), y - 5        , x
      |enum2int(SB_TI_S), y + 2        , x
      |enum2int(SB_TI_S), y + 3        , x
      |enum2int(SB_TI_S), y + 4        , x
