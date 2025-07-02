@@ -113,52 +113,32 @@ constraint forall (n in 1..NODES) (sb[n] == SB_None <-> next[n] == n);
 % Next agrees with surface belt placement.
 constraint forall(y in 1..HEIGHT, x in 1..WIDTH where ends(y,x) = 0)
   (table(
-    [enum2int(sb(y, x)), next(y, x)],
-    [|enum2int(SB_None), index(y    , x    )
-     |enum2int(   SB_N), index(y - 1, x    )
-     |enum2int(   SB_S), index(y + 1, x    )
-     |enum2int(   SB_W), index(y    , x - 1)
-     |enum2int(   SB_E), index(y    , x + 1)
-     |enum2int(SB_TO_N), index(y - 1, x    )
-     |enum2int(SB_TO_S), index(y + 1, x    )
-     |enum2int(SB_TO_W), index(y    , x - 1)
-     |enum2int(SB_TO_E), index(y    , x + 1)
-     |enum2int(SB_TI_N), index(y - 2, x    )
-     |enum2int(SB_TI_N), index(y - 3, x    )
-     |enum2int(SB_TI_N), index(y - 4, x    )
-     |enum2int(SB_TI_S), index(y - 5, x    )
-     |enum2int(SB_TI_S), index(y + 2, x    )
-     |enum2int(SB_TI_S), index(y + 3, x    )
-     |enum2int(SB_TI_S), index(y + 4, x    )
-     |enum2int(SB_TI_S), index(y + 5, x    )
-     |enum2int(SB_TI_W), index(y    , x - 2)
-     |enum2int(SB_TI_W), index(y    , x - 3)
-     |enum2int(SB_TI_W), index(y    , x - 4)
-     |enum2int(SB_TI_W), index(y    , x - 5)
-     |enum2int(SB_TI_E), index(y    , x + 2)
-     |enum2int(SB_TI_E), index(y    , x + 3)
-     |enum2int(SB_TI_E), index(y    , x + 4)
-     |enum2int(SB_TI_E), index(y    , x + 5)|]));
-
-% ----------------------
-%   Agent Constraints
-% ----------------------
-
-% Empty cells have no agent.
-constraint forall (n in 1..NODES) (sb[n] = SB_None <-> sba[n] = 0);
-
-% The agent of a cell equals the agent of the cell it points at for all nodes except ends.
-constraint forall (n in 1..NODES where ends[n] == 0) (sba[n] == sba[next[n]]);
-
-% Agent starts must match.
-constraint forall (n in 1..NODES where starts[n] != 0) (sba[n] == starts[n]);
-
-% Agent ends must match.
-constraint forall (n in 1..NODES where ends[n] != 0) (sba[n] == ends[n]);
-
-% ----------------------
-%   Tunnel Constraints
-% ----------------------
+    [enum2int(sb(y, x)), y(next(y, x)), x(next(y, x))],
+    [|enum2int(SB_None), y            , x
+     |enum2int(   SB_N), y - 1        , x
+     |enum2int(   SB_S), y + 1        , x
+     |enum2int(   SB_W), y            , x - 1
+     |enum2int(   SB_E), y            , x + 1
+     |enum2int(SB_TO_N), y - 1        , x
+     |enum2int(SB_TO_S), y + 1        , x
+     |enum2int(SB_TO_W), y            , x - 1
+     |enum2int(SB_TO_E), y            , x + 1
+     |enum2int(SB_TI_N), y - 2        , x
+     |enum2int(SB_TI_N), y - 3        , x
+     |enum2int(SB_TI_N), y - 4        , x
+     |enum2int(SB_TI_S), y - 5        , x
+     |enum2int(SB_TI_S), y + 2        , x
+     |enum2int(SB_TI_S), y + 3        , x
+     |enum2int(SB_TI_S), y + 4        , x
+     |enum2int(SB_TI_S), y + 5        , x
+     |enum2int(SB_TI_W), y            , x - 2
+     |enum2int(SB_TI_W), y            , x - 3
+     |enum2int(SB_TI_W), y            , x - 4
+     |enum2int(SB_TI_W), y            , x - 5
+     |enum2int(SB_TI_E), y            , x + 2
+     |enum2int(SB_TI_E), y            , x + 3
+     |enum2int(SB_TI_E), y            , x + 4
+     |enum2int(SB_TI_E), y            , x + 5|]));
 
 % Enforce belt to belt transitions are valid.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0)
@@ -202,12 +182,25 @@ constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0)
      |enum2int(SB_TO_E), enum2int(SB_TI_E)
      |enum2int(SB_None), enum2int(SB_None)|]));
 
-% Enforce tunnel entrances are preceded by a node facing into them.
-constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
-  if     sb(y, x) == SB_TI_S then 1 < y      /\ next(y - 1, x   ) == index(y, x)
-  elseif sb(y, x) == SB_TI_N then y < HEIGHT /\ next(y + 1, x   ) == index(y, x)
-  elseif sb(y, x) == SB_TI_E then 1 < x      /\ next(y   , x - 1) == index(y, x)
-  elseif sb(y, x) == SB_TI_W then x < WIDTH  /\ next(y   , x + 1) == index(y, x) endif);
+% ----------------------
+%   Agent Constraints
+% ----------------------
+
+% Empty cells have no agent.
+constraint forall (n in 1..NODES) (sb[n] = SB_None <-> sba[n] = 0);
+
+% The agent of a cell equals the agent of the cell it points at for all nodes except ends.
+constraint forall (n in 1..NODES where ends[n] == 0) (sba[n] == sba[next[n]]);
+
+% Agent starts must match.
+constraint forall (n in 1..NODES where starts[n] != 0) (sba[n] == starts[n]);
+
+% Agent ends must match.
+constraint forall (n in 1..NODES where ends[n] != 0) (sba[n] == ends[n]);
+
+% ----------------------
+%   Tunnel Constraints
+% ----------------------
 
 % Disallow nested tunnels in the same axis.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
@@ -272,6 +265,17 @@ constraint forall(y in 1..HEIGHT-1, x in 1..WIDTH-1)
                         [ sb(y,x), sb(y,x+1), sb(y+1,x), sb(y+1,x+1) ]; } in
                   forall(p in 1..16)
                         (exists(i in 1..4)(block[i] != pattern[p,i])));
+
+% ----------------------
+% Redundant Constraints
+% ----------------------
+
+% Tunnel entrances cannot be on the sides of the grid.
+constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
+  if     sb(y, x) == SB_TI_S then 1 < y
+  elseif sb(y, x) == SB_TI_N then y < HEIGHT
+  elseif sb(y, x) == SB_TI_E then 1 < x
+  elseif sb(y, x) == SB_TI_W then x < WIDTH endif);
 
 % ----------------------
 %         Goal
