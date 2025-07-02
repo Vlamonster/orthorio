@@ -283,7 +283,7 @@ constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0) (
 %         Goal
 % ----------------------
 
-var 0..HEIGHT * WIDTH: goal = count (n in 1..NODES) (sb[n] != SB_None);
+var 2 * AGENTS..HEIGHT * WIDTH: goal = count (n in 1..NODES) (sb[n] != SB_None);
 
 solve minimize goal;
 
