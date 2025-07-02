@@ -55,8 +55,11 @@ array[1..NODES] of var 1..NODES: next;
 %       Functions
 % ----------------------
 
+function bool: bounds(int: y, int: x) =
+  y in 1..HEIGHT /\ x in 1..WIDTH;
+
 function 0..NODES: index(int: y, int: x) =
-  if 0 < y /\ y < HEIGHT + 1 /\ 0 < x /\ x < WIDTH + 1 then (y - 1) * WIDTH + x else 0 endif;
+  if bounds(y, x) then (y - 1) * WIDTH + x else 0 endif;
 
 function var 1..WIDTH: x(var int: n) =
   (n - 1) mod WIDTH + 1;
@@ -65,10 +68,10 @@ function var 1..HEIGHT: y(var int: n) =
   (n - 1) div WIDTH + 1;
 
 function var SB: sb(int: y, int: x) =
-  sb[index(y, x)];
+  if bounds(y, x) then sb[index(y, x)] else SB_None endif;
 
 function var 0..AGENTS: sba(int: y, int: x) =
-  sba[index(y, x)];
+  if bounds(y, x) then sba[index(y, x)] else 0 endif;
 
 function 1..NODES: path(int: a, Marker: m) =
   index(path[a, m].y, path[a, m].x);
@@ -316,7 +319,7 @@ function string: show_sb(int: y, int: x) =
   elseif fix(sb[index(y, x)]) == SB_TO_S then "║"
   elseif fix(sb[index(y, x)]) == SB_TO_W then "═"
   elseif fix(sb[index(y, x)]) == SB_TO_E then "═"
-  
+
   elseif fix(sb[index(y, x)]) == SB_TI_N then "║"
   elseif fix(sb[index(y, x)]) == SB_TI_S then "║"
   elseif fix(sb[index(y, x)]) == SB_TI_W then "═"
