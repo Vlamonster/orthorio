@@ -267,17 +267,6 @@ constraint forall(y in 1..HEIGHT-1, x in 1..WIDTH-1)
                         (exists(i in 1..4)(block[i] != pattern[p,i])));
 
 % ----------------------
-% Redundant Constraints
-% ----------------------
-
-% Tunnel entrances cannot be on the sides of the grid.
-constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
-  if     sb(y, x) == SB_TI_S then 1 < y
-  elseif sb(y, x) == SB_TI_N then y < HEIGHT
-  elseif sb(y, x) == SB_TI_E then 1 < x
-  elseif sb(y, x) == SB_TI_W then x < WIDTH endif);
-
-% ----------------------
 %         Goal
 % ----------------------
 
