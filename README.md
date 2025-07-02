@@ -1,6 +1,6 @@
 # About
 
-Hobby project to solve complex multi-agent pathfinding problem using Factorio's conveyor belts.
+Hobby project to solve complex multi-agent pathfinding problems using Factorio's conveyor belts.
 
 Meant to be used with MiniZinc and works best when compiled for and ran with Google OR-Tools. See `problems` directory for problem intances.
 
