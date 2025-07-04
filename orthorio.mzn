@@ -282,10 +282,10 @@ constraint forall(y in 1..HEIGHT-1, x in 1..WIDTH-1)
 % ----------------------
 
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0) (
-  if     y == 1      then sb(y, x) in SB diff {SB_N, SB_TO_N, SB_TI_N}
-  elseif y == HEIGHT then sb(y, x) in SB diff {SB_S, SB_TO_S, SB_TI_S}
-  elseif x == 1      then sb(y, x) in SB diff {SB_W, SB_TO_W, SB_TI_W}
-  elseif x == WIDTH  then sb(y, x) in SB diff {SB_E, SB_TO_E, SB_TI_E} endif);
+  if     y == 1      then sb(y, x) in SB diff {SB_N, SB_TO_S, SB_TI_N}
+  elseif y == HEIGHT then sb(y, x) in SB diff {SB_S, SB_TO_N, SB_TI_S}
+  elseif x == 1      then sb(y, x) in SB diff {SB_W, SB_TO_E, SB_TI_W}
+  elseif x == WIDTH  then sb(y, x) in SB diff {SB_E, SB_TO_W, SB_TI_E} endif);
 
 % ----------------------
 %         Goal
