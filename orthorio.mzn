@@ -10,8 +10,10 @@ int: AGENTS;
 int: NODES = HEIGHT * WIDTH;
 
 array[1..AGENTS, Marker] of Node: path;
+array[1..HEIGHT, 1..WIDTH] of 0..1: walls;
 array[1..NODES] of 0..AGENTS: starts = [sum (a in 1..AGENTS) (a * (path(a, Start) == n)) | n in 1..NODES];
 array[1..NODES] of 0..AGENTS:   ends = [sum (a in 1..AGENTS) (a * (path(a,   End) == n)) | n in 1..NODES];
+
 
 % ----------------------
 %      Datatypes
@@ -20,6 +22,7 @@ array[1..NODES] of 0..AGENTS:   ends = [sum (a in 1..AGENTS) (a * (path(a,   End
 % Surface belt types.
 enum SB = {
   SB_None,
+  SB_Wall,
   SB_N,
   SB_E,
   SB_S,
@@ -114,18 +117,21 @@ constraint forall (a in 1..AGENTS, m in Marker) (
   elseif path[a, m].d == "<" then sb[path(a, m)] == SB_W
   elseif path[a, m].d == ">" then sb[path(a, m)] == SB_E endif);
 
+constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (sb(y, x) == SB_Wall <-> walls[y, x] == 1);
+
 % ----------------------
 % Channeling Constraints
 % ----------------------
 
 % Empty cells point at themselves.
-constraint forall (n in 1..NODES) (sb[n] == SB_None <-> next[n] == n);
+constraint forall (n in 1..NODES) (sb[n] in {SB_None, SB_Wall} <-> next[n] == n);
 
 % Next agrees with surface belt placement.
 constraint forall(y in 1..HEIGHT, x in 1..WIDTH where ends(y,x) = 0)
   (table(
     [enum2int(sb(y, x)), nexty(y, x), nextx(y, x)],
     [|enum2int(SB_None), y          , x
+     |enum2int(SB_Wall), y          , x
      |enum2int(   SB_N), y - 1      , x
      |enum2int(   SB_S), y + 1      , x
      |enum2int(   SB_W), y          , x - 1
@@ -155,7 +161,9 @@ constraint forall(y in 1..HEIGHT, x in 1..WIDTH where ends(y,x) = 0)
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0)
   (table(
     [enum2int(sb(y, x)), enum2int(sb[next(y, x)])],
-    [|enum2int(SB_TI_N), enum2int(SB_TO_N)
+    [|enum2int(SB_None), enum2int(SB_None)
+     |enum2int(SB_Wall), enum2int(SB_Wall)
+     |enum2int(SB_TI_N), enum2int(SB_TO_N)
      |enum2int(SB_TI_S), enum2int(SB_TO_S)
      |enum2int(SB_TI_W), enum2int(SB_TO_W)
      |enum2int(SB_TI_E), enum2int(SB_TO_E)
@@ -190,8 +198,7 @@ constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0)
      |enum2int(SB_TO_E), enum2int(   SB_N)
      |enum2int(SB_TO_E), enum2int(   SB_S)
      |enum2int(SB_TO_E), enum2int(   SB_E)
-     |enum2int(SB_TO_E), enum2int(SB_TI_E)
-     |enum2int(SB_None), enum2int(SB_None)|]));
+     |enum2int(SB_TO_E), enum2int(SB_TI_E)|]));
 
 % ----------------------
 %   Agent Constraints
@@ -310,7 +317,11 @@ function string: show_sb(int: y, int: x) =
     bool: IW = 1 < x      /\ (fix(sb[index(y    , x - 1)]) == SB_E \/ fix(sb[index(y    , x - 1)]) == SB_TO_E);
     bool: IE = x < WIDTH  /\ (fix(sb[index(y    , x + 1)]) == SB_W \/ fix(sb[index(y    , x + 1)]) == SB_TO_W);
   } in
-  if IN /\ ON then "?"
+  
+  if     fix(sb[index(y, x)]) == SB_None then " "
+  elseif fix(sb[index(y, x)]) == SB_Wall then "✗"
+  
+  elseif IN /\ ON then "?"
   elseif IN /\ OS then "│"
   elseif IN /\ OW then "┘"
   elseif IN /\ OE then "└"
@@ -345,9 +356,8 @@ function string: show_sb(int: y, int: x) =
   elseif fix(sb[index(y, x)]) == SB_TI_W then "═"
   elseif fix(sb[index(y, x)]) == SB_TI_E then "═"
 
-  elseif fix(sb[index(y, x)]) != SB_None then "?"
-
-  else " "
+  else "?"
+  
   endif;
 
 output [show_sb(y, x) ++ if x == WIDTH then "\n" else "" endif | y in 1..HEIGHT, x in 1..WIDTH] ++
