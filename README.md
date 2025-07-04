@@ -31,7 +31,7 @@ Level 1.2 (Lower Bound = 78)
 92
 ----------
 ```
-Level 2.1 (Lower Bound = 235)
+Level 2.1 (Lower Bound = 239)
 ```
        ╳╳╳╳╳╳╳╳╳╳╳╳        
        ╳╳╳╳╳╳╳╳╳╳╳╳        
