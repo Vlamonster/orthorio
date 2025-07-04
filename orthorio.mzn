@@ -11,7 +11,7 @@ int: NODES = HEIGHT * WIDTH;
 
 array[1..AGENTS, Marker] of Node: path;
 array[1..NODES] of 0..AGENTS: starts = [sum (a in 1..AGENTS) (a * (path(a, Start) == n)) | n in 1..NODES];
-array[1..NODES] of 0..AGENTS: ends = [sum (a in 1..AGENTS) (a * (path(a, End) == n)) | n in 1..NODES];
+array[1..NODES] of 0..AGENTS:   ends = [sum (a in 1..AGENTS) (a * (path(a,   End) == n)) | n in 1..NODES];
 
 % ----------------------
 %      Datatypes
@@ -50,6 +50,8 @@ type Node = record (int: y, int: x, string: d);
 array[1..NODES] of var SB: sb;
 array[1..NODES] of var 0..AGENTS: sba;
 array[1..NODES] of var 1..NODES: next;
+array[1..NODES] of var 1..HEIGHT: nexty = [y(next[n]) | n in 1..NODES];
+array[1..NODES] of var 1..WIDTH:  nextx = [x(next[n]) | n in 1..NODES];
 
 % ----------------------
 %       Functions
@@ -85,6 +87,12 @@ function 0..AGENTS: ends(int: y, int: x) =
 function var 1..NODES: next(int: y, int: x) =
   next[index(y, x)];
 
+function var 1..HEIGHT: nexty(int: y, int: x) =
+  nexty[index(y, x)];
+
+function var 1..WIDTH: nextx(int: y, int: x) =
+  nextx[index(y, x)];
+
 % ----------------------
 %   Global Constraints
 % ----------------------
@@ -116,37 +124,37 @@ constraint forall (n in 1..NODES) (sb[n] == SB_None <-> next[n] == n);
 % Next agrees with surface belt placement.
 constraint forall(y in 1..HEIGHT, x in 1..WIDTH where ends(y,x) = 0)
   (table(
-    [enum2int(sb(y, x)), y(next(y, x)), x(next(y, x))],
-    [|enum2int(SB_None), y            , x
-     |enum2int(   SB_N), y - 1        , x
-     |enum2int(   SB_S), y + 1        , x
-     |enum2int(   SB_W), y            , x - 1
-     |enum2int(   SB_E), y            , x + 1
-     |enum2int(SB_TO_N), y - 1        , x
-     |enum2int(SB_TO_S), y + 1        , x
-     |enum2int(SB_TO_W), y            , x - 1
-     |enum2int(SB_TO_E), y            , x + 1
-     |enum2int(SB_TI_N), y - 2        , x
-     |enum2int(SB_TI_N), y - 3        , x
-     |enum2int(SB_TI_N), y - 4        , x
-     |enum2int(SB_TI_N), y - 5        , x
-     |enum2int(SB_TI_S), y + 2        , x
-     |enum2int(SB_TI_S), y + 3        , x
-     |enum2int(SB_TI_S), y + 4        , x
-     |enum2int(SB_TI_S), y + 5        , x
-     |enum2int(SB_TI_W), y            , x - 2
-     |enum2int(SB_TI_W), y            , x - 3
-     |enum2int(SB_TI_W), y            , x - 4
-     |enum2int(SB_TI_W), y            , x - 5
-     |enum2int(SB_TI_E), y            , x + 2
-     |enum2int(SB_TI_E), y            , x + 3
-     |enum2int(SB_TI_E), y            , x + 4
-     |enum2int(SB_TI_E), y            , x + 5|]));
+    [enum2int(sb(y, x)), nexty(y, x), nextx(y, x)],
+    [|enum2int(SB_None), y          , x
+     |enum2int(   SB_N), y - 1      , x
+     |enum2int(   SB_S), y + 1      , x
+     |enum2int(   SB_W), y          , x - 1
+     |enum2int(   SB_E), y          , x + 1
+     |enum2int(SB_TO_N), y - 1      , x
+     |enum2int(SB_TO_S), y + 1      , x
+     |enum2int(SB_TO_W), y          , x - 1
+     |enum2int(SB_TO_E), y          , x + 1
+     |enum2int(SB_TI_N), y - 2      , x
+     |enum2int(SB_TI_N), y - 3      , x
+     |enum2int(SB_TI_N), y - 4      , x
+     |enum2int(SB_TI_N), y - 5      , x
+     |enum2int(SB_TI_S), y + 2      , x
+     |enum2int(SB_TI_S), y + 3      , x
+     |enum2int(SB_TI_S), y + 4      , x
+     |enum2int(SB_TI_S), y + 5      , x
+     |enum2int(SB_TI_W), y          , x - 2
+     |enum2int(SB_TI_W), y          , x - 3
+     |enum2int(SB_TI_W), y          , x - 4
+     |enum2int(SB_TI_W), y          , x - 5
+     |enum2int(SB_TI_E), y          , x + 2
+     |enum2int(SB_TI_E), y          , x + 3
+     |enum2int(SB_TI_E), y          , x + 4
+     |enum2int(SB_TI_E), y          , x + 5|]));
 
 % Enforce belt to belt transitions are valid.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0)
   (table(
-    [enum2int(sb[index(y, x)]), enum2int(sb[next(y, x)])],
+    [enum2int(sb(y, x)), enum2int(sb[next(y, x)])],
     [|enum2int(SB_TI_N), enum2int(SB_TO_N)
      |enum2int(SB_TI_S), enum2int(SB_TO_S)
      |enum2int(SB_TI_W), enum2int(SB_TO_W)
@@ -211,10 +219,10 @@ constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
     set of SB: notNS = SB diff {SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S};
     set of SB: notWE = SB diff {SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W};
   } in
-  if     sb(y, x) == SB_TI_N then forall (yy in y(next(y, x)) + 1..y - 1) (sb(yy,  x) in notNS)
-  elseif sb(y, x) == SB_TI_S then forall (yy in y + 1..y(next(y, x)) - 1) (sb(yy,  x) in notNS)
-  elseif sb(y, x) == SB_TI_W then forall (xx in x(next(y, x)) + 1..x - 1) (sb( y, xx) in notWE)
-  elseif sb(y, x) == SB_TI_E then forall (xx in x + 1..x(next(y, x)) - 1) (sb( y, xx) in notWE) endif);
+  if     sb(y, x) == SB_TI_N then forall (yy in nexty(y, x) + 1..y - 1) (sb(yy,  x) in notNS)
+  elseif sb(y, x) == SB_TI_S then forall (yy in y + 1..nexty(y, x) - 1) (sb(yy,  x) in notNS)
+  elseif sb(y, x) == SB_TI_W then forall (xx in nextx(y, x) + 1..x - 1) (sb( y, xx) in notWE)
+  elseif sb(y, x) == SB_TI_E then forall (xx in x + 1..nextx(y, x) - 1) (sb( y, xx) in notWE) endif);
 
 % Tunnel entrances are followed by a non-empty tile.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
