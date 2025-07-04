@@ -319,7 +319,7 @@ function string: show_sb(int: y, int: x) =
   } in
   
   if     fix(sb[index(y, x)]) == SB_None then " "
-  elseif fix(sb[index(y, x)]) == SB_Wall then "✗"
+  elseif fix(sb[index(y, x)]) == SB_Wall then "╳"
   
   elseif IN /\ ON then "?"
   elseif IN /\ OS then "│"
