@@ -8,6 +8,7 @@ int: HEIGHT;
 int: WIDTH;
 int: AGENTS;
 int: NODES = HEIGHT * WIDTH;
+int: WALLS = sum(walls);
 
 array[1..AGENTS, Marker] of Node: path;
 array[1..HEIGHT, 1..WIDTH] of 0..1: walls;
@@ -298,7 +299,7 @@ constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0) (
 %         Goal
 % ----------------------
 
-var 2 * AGENTS..HEIGHT * WIDTH: goal = count (n in 1..NODES) (sb[n] in SB diff {SB_None, SB_Wall});
+var 2 * AGENTS..HEIGHT * WIDTH - WALLS: goal = count (n in 1..NODES) (sb[n] in SB diff {SB_None, SB_Wall});
 
 solve minimize goal;
 
