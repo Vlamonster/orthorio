@@ -205,7 +205,7 @@ constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0)
 % ----------------------
 
 % Empty cells have no agent.
-constraint forall (n in 1..NODES) (sb[n] = SB_None <-> sba[n] = 0);
+constraint forall (n in 1..NODES) (sb[n] in {SB_None, SB_Wall} <-> sba[n] = 0);
 
 % The agent of a cell equals the agent of the cell it points at for all nodes except ends.
 constraint forall (n in 1..NODES where ends[n] == 0) (sba[n] == sba[next[n]]);
@@ -298,7 +298,7 @@ constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0) (
 %         Goal
 % ----------------------
 
-var 2 * AGENTS..HEIGHT * WIDTH: goal = count (n in 1..NODES) (sb[n] != SB_None);
+var 2 * AGENTS..HEIGHT * WIDTH: goal = count (n in 1..NODES) (sb[n] in SB diff {SB_None, SB_Wall});
 
 solve minimize goal;
 
