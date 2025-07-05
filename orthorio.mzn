@@ -257,33 +257,40 @@ constraint forall (a in 1..AGENTS) (next[path(a, Start)] != path(a, Start));
 constraint forall (a in 1..AGENTS) (next[path(a, End)] == path(a mod AGENTS + 1, Start));
 
 % ----------------------
-% No shortcut Constraints
+%  Disallowed Patterns
 % ----------------------
 
-array[1..16, 1..4] of SB: pattern =
- [| SB_S, SB_E, SB_E, SB_N
-  | SB_N, SB_S, SB_N, SB_W
-  | SB_S, SB_N, SB_E, SB_N
-  | SB_W, SB_S, SB_N, SB_W
-  | SB_S, SB_W, SB_W, SB_N
-  | SB_E, SB_S, SB_N, SB_S
-  | SB_S, SB_W, SB_S, SB_N
-  | SB_E, SB_S, SB_N, SB_E
-  | SB_S, SB_W, SB_E, SB_S
-  | SB_E, SB_E, SB_N, SB_W
-  | SB_S, SB_W, SB_E, SB_E
-  | SB_E, SB_N, SB_N, SB_W
-  | SB_N, SB_W, SB_E, SB_N
-  | SB_E, SB_S, SB_W, SB_W
-  | SB_W, SB_W, SB_E, SB_N
-  | SB_E, SB_S, SB_S, SB_W
-  |];
+% u shapes.
+array[int, 1..4] of SB: u_shapes =
+ [|SB_S, SB_E, SB_E, SB_N
+  |SB_N, SB_S, SB_N, SB_W
+  |SB_S, SB_N, SB_E, SB_N
+  |SB_W, SB_S, SB_N, SB_W
+  |SB_S, SB_W, SB_W, SB_N
+  |SB_E, SB_S, SB_N, SB_S
+  |SB_S, SB_W, SB_S, SB_N
+  |SB_E, SB_S, SB_N, SB_E
+  |SB_S, SB_W, SB_E, SB_S
+  |SB_E, SB_E, SB_N, SB_W
+  |SB_S, SB_W, SB_E, SB_E
+  |SB_E, SB_N, SB_N, SB_W
+  |SB_N, SB_W, SB_E, SB_N
+  |SB_E, SB_S, SB_W, SB_W
+  |SB_W, SB_W, SB_E, SB_N
+  |SB_E, SB_S, SB_S, SB_W|];
 
-constraint forall(y in 1..HEIGHT-1, x in 1..WIDTH-1)
-                 (let { array[1..4] of var SB: block =
-                        [ sb(y,x), sb(y,x+1), sb(y+1,x), sb(y+1,x+1) ]; } in
-                  forall(p in 1..16)
-                        (exists(i in 1..4)(block[i] != pattern[p,i])));
+% o shapes.
+array[int, 1..4] of SB: o_shapes =
+ [|SB_E, SB_S, SB_N, SB_W
+  |SB_S, SB_W, SB_E, SB_N|];
+
+array[int, 1..4] of SB: disallowed_shapes = u_shapes ++ o_shapes;
+
+constraint forall(y in 1..HEIGHT-1, x in 1..WIDTH-1) (
+  forall (p in index_set_1of2(disallowed_shapes)) (
+    exists (i in 1..4) (
+      [sb(y    , x    ), sb(y    , x + 1), 
+       sb(y + 1, x    ), sb(y + 1, x + 1)][i] != disallowed_shapes[p, i])));
 
 % ----------------------
 % Redundant Constraints
