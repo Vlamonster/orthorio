@@ -1,4 +1,5 @@
 include "globals.mzn";
+include "ide/vis.mzn";
 
 % ----------------------
 %      Parameters
@@ -401,6 +402,19 @@ solve minimize goal;
 % ----------------------
 %       Output
 % ----------------------
+
+any: initial_data :: output_only = (
+  height: HEIGHT,
+  width:  WIDTH,
+  agents: AGENTS,
+  walls:  walls,
+  path:   path);
+  
+any: solution_data :: output_only = (
+  sb: fix(sb)
+);
+
+output :: vis_server("orthorio.html", initial_data) solution_data;
 
 function string: show_sb(int: y, int: x) =
   let {

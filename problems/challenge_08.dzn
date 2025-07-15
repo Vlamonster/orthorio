@@ -1,0 +1,12 @@
+HEIGHT = 9;
+WIDTH = 9;
+AGENTS = 5;
+
+path = array2d(1..AGENTS, Marker,
+  [|(y: 4, x: 1, d: ">"), (y: 6, x: 9, d: ">")
+   |(y: 6, x: 1, d: ">"), (y: 4, x: 9, d: ">")
+   |(y: 1, x: 3, d: "v"), (y: 9, x: 7, d: "v")
+   |(y: 1, x: 5, d: "v"), (y: 9, x: 5, d: "v")
+   |(y: 1, x: 7, d: "v"), (y: 9, x: 3, d: "v")|]);
+
+walls = array2d(1..HEIGHT, 1..WIDTH, [0 | _ in 1..HEIGHT, _ in 1..WIDTH]);
