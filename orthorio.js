@@ -1,8 +1,8 @@
 (async function() {
   const userData = await MiniZincIDE.getUserData();
 
-  const tileWidth = 32;
-  const tileHeight = 32;
+  const tileWidth = 64;
+  const tileHeight = 64;
 
   const totalWidth = userData.width * tileWidth;
   const totalHeight = userData.height * tileHeight;
@@ -21,8 +21,6 @@
       grass.setAttribute("href", "resources/grass.png");
       grass.setAttribute("x", x * tileWidth);
       grass.setAttribute("y", y * tileHeight);
-      grass.setAttribute("width", tileWidth);
-      grass.setAttribute("height", tileHeight);
       background.appendChild(grass);
     }
   }
@@ -32,11 +30,9 @@
   for (let y = 0; y < userData.height; y++) {
     for (let x = 0; x < userData.width; x++) {
       const image = document.createElementNS("http://www.w3.org/2000/svg", "image");
-      image.setAttribute("href", "resources/grass.png");
+      image.setAttribute("href", "resources/empty.png");
       image.setAttribute("x", x * tileWidth);
       image.setAttribute("y", y * tileHeight);
-      image.setAttribute("width", tileWidth);
-      image.setAttribute("height", tileHeight);
       imageMap.set(y * userData.width + x, image);
       grid.appendChild(image);
     }
@@ -64,29 +60,29 @@
         else if (sb[i].e == "SB_Wall") imageMap.get(i).setAttribute("href", "resources/empty.png");
 
         else if (IN && ON) imageMap.get(i).setAttribute("href", "resources/empty.png"); // ?
-        else if (IN && OS) imageMap.get(i).setAttribute("href", "resources/belt-NS.png");
-        else if (IN && OW) imageMap.get(i).setAttribute("href", "resources/belt-NW.png");
-        else if (IN && OE) imageMap.get(i).setAttribute("href", "resources/belt-NE.png");
+        else if (IN && OS) imageMap.get(i).setAttribute("href", "resources/SB_NS_1.png");
+        else if (IN && OW) imageMap.get(i).setAttribute("href", "resources/SB_NW_1.png");
+        else if (IN && OE) imageMap.get(i).setAttribute("href", "resources/SB_NE_1.png");
 
-        else if (IS && ON) imageMap.get(i).setAttribute("href", "resources/belt-SN.png");
+        else if (IS && ON) imageMap.get(i).setAttribute("href", "resources/SB_SN_1.png");
         else if (IS && OS) imageMap.get(i).setAttribute("href", "resources/empty.png"); // ?
-        else if (IS && OW) imageMap.get(i).setAttribute("href", "resources/belt-SW.png");
-        else if (IS && OE) imageMap.get(i).setAttribute("href", "resources/belt-SE.png");
+        else if (IS && OW) imageMap.get(i).setAttribute("href", "resources/SB_SW_1.png");
+        else if (IS && OE) imageMap.get(i).setAttribute("href", "resources/SB_SE_1.png");
 
-        else if (IW && ON) imageMap.get(i).setAttribute("href", "resources/belt-WN.png");
-        else if (IW && OS) imageMap.get(i).setAttribute("href", "resources/belt-WS.png");
+        else if (IW && ON) imageMap.get(i).setAttribute("href", "resources/SB_WN_1.png");
+        else if (IW && OS) imageMap.get(i).setAttribute("href", "resources/SB_WS_1.png");
         else if (IW && OW) imageMap.get(i).setAttribute("href", "resources/empty.png"); // ?
-        else if (IW && OE) imageMap.get(i).setAttribute("href", "resources/belt-WE.png");
+        else if (IW && OE) imageMap.get(i).setAttribute("href", "resources/SB_WE_1.png");
 
-        else if (IE && ON) imageMap.get(i).setAttribute("href", "resources/belt-EN.png");
-        else if (IE && OS) imageMap.get(i).setAttribute("href", "resources/belt-ES.png");
-        else if (IE && OW) imageMap.get(i).setAttribute("href", "resources/belt-EW.png");
+        else if (IE && ON) imageMap.get(i).setAttribute("href", "resources/SB_EN_1.png");
+        else if (IE && OS) imageMap.get(i).setAttribute("href", "resources/SB_ES_1.png");
+        else if (IE && OW) imageMap.get(i).setAttribute("href", "resources/SB_EW_1.png");
         else if (IE && OE) imageMap.get(i).setAttribute("href", "resources/empty.png"); // ?
 
-        else if (ON) imageMap.get(i).setAttribute("href", "resources/belt-SN.png");
-        else if (OS) imageMap.get(i).setAttribute("href", "resources/belt-NS.png");
-        else if (OW) imageMap.get(i).setAttribute("href", "resources/belt-EW.png");
-        else if (OE) imageMap.get(i).setAttribute("href", "resources/belt-WE.png");
+        else if (ON) imageMap.get(i).setAttribute("href", "resources/SB_SN_1.png");
+        else if (OS) imageMap.get(i).setAttribute("href", "resources/SB_NS_1.png");
+        else if (OW) imageMap.get(i).setAttribute("href", "resources/SB_EW_1.png");
+        else if (OE) imageMap.get(i).setAttribute("href", "resources/SB_WE_1.png");
 
         else if (sb[i].e == "SB_TI_N4") imageMap.get(i).setAttribute("href", "resources/SB_TI_N4.png");
         else if (sb[i].e == "SB_TI_S4") imageMap.get(i).setAttribute("href", "resources/SB_TI_S4.png");
