@@ -57,7 +57,7 @@
         const IE = x < userData.width - 1  && (sb[index(y    , x + 1)].e == "SB_W" || sb[index(y    , x + 1)].e == "SB_TO_W4")
 
         if      (sb[i].e == "SB_None") imageMap.get(i).setAttribute("href", "resources/empty.png");
-        else if (sb[i].e == "SB_Wall") imageMap.get(i).setAttribute("href", "resources/empty.png");
+        else if (sb[i].e == "SB_Wall") imageMap.get(i).setAttribute("href", "resources/rock.png");
 
         else if (IN && ON) imageMap.get(i).setAttribute("href", "resources/empty.png"); // ?
         else if (IN && OS) imageMap.get(i).setAttribute("href", "resources/SB_NS_1.png");
@@ -86,8 +86,8 @@
 
         else if (sb[i].e == "SB_TI_N4") imageMap.get(i).setAttribute("href", "resources/SB_TI_N4.png");
         else if (sb[i].e == "SB_TI_S4") imageMap.get(i).setAttribute("href", "resources/SB_TI_S4.png");
+        else if (sb[i].e == "SB_TI_W4") imageMap.get(i).setAttribute("href", "resources/SB_TI_W4.png");
         else if (sb[i].e == "SB_TI_E4") imageMap.get(i).setAttribute("href", "resources/SB_TI_E4.png");
-        else if (sb[i].e == "SB_TE_E4") imageMap.get(i).setAttribute("href", "resources/SB_TE_E4.png");
 
         else if (sb[i].e == "SB_TO_N4") imageMap.get(i).setAttribute("href", "resources/SB_TO_N4.png");
         else if (sb[i].e == "SB_TO_S4") imageMap.get(i).setAttribute("href", "resources/SB_TO_S4.png");
