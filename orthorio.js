@@ -51,38 +51,38 @@
         const OW = sb[i].e == "SB_W";
         const OE = sb[i].e == "SB_E";
 
-        const IN = 0 < y                   && (sb[index(y - 1, x    )].e == "SB_S" || sb[index(y - 1, x    )].e == "SB_TO_S4")
-        const IS = y < userData.height - 1 && (sb[index(y + 1, x    )].e == "SB_N" || sb[index(y + 1, x    )].e == "SB_TO_N4")
-        const IW = 0 < x                   && (sb[index(y    , x - 1)].e == "SB_E" || sb[index(y    , x - 1)].e == "SB_TO_E4")
-        const IE = x < userData.width - 1  && (sb[index(y    , x + 1)].e == "SB_W" || sb[index(y    , x + 1)].e == "SB_TO_W4")
+        const IN = 0 < y                   && (sb[index(y - 1, x    )].e == "SB_S" || sb[index(y - 1, x    )].e == "SB_TO_S4" || sb[index(y - 1, x    )].e == "SB_TO_S6");
+        const IS = y < userData.height - 1 && (sb[index(y + 1, x    )].e == "SB_N" || sb[index(y + 1, x    )].e == "SB_TO_N4" || sb[index(y + 1, x    )].e == "SB_TO_N6");
+        const IW = 0 < x                   && (sb[index(y    , x - 1)].e == "SB_E" || sb[index(y    , x - 1)].e == "SB_TO_E4" || sb[index(y    , x - 1)].e == "SB_TO_E6");
+        const IE = x < userData.width - 1  && (sb[index(y    , x + 1)].e == "SB_W" || sb[index(y    , x + 1)].e == "SB_TO_W4" || sb[index(y    , x + 1)].e == "SB_TO_W6");
 
         if      (sb[i].e == "SB_None") imageMap.get(i).setAttribute("href", "resources/empty.png");
         else if (sb[i].e == "SB_Wall") imageMap.get(i).setAttribute("href", "resources/rock.png");
 
         else if (IN && ON) imageMap.get(i).setAttribute("href", "resources/empty.png"); // ?
-        else if (IN && OS) imageMap.get(i).setAttribute("href", "resources/SB_NS_1.png");
-        else if (IN && OW) imageMap.get(i).setAttribute("href", "resources/SB_NW_1.png");
-        else if (IN && OE) imageMap.get(i).setAttribute("href", "resources/SB_NE_1.png");
+        else if (IN && OS) imageMap.get(i).setAttribute("href", "resources/SB_NS.png");
+        else if (IN && OW) imageMap.get(i).setAttribute("href", "resources/SB_NW.png");
+        else if (IN && OE) imageMap.get(i).setAttribute("href", "resources/SB_NE.png");
 
-        else if (IS && ON) imageMap.get(i).setAttribute("href", "resources/SB_SN_1.png");
+        else if (IS && ON) imageMap.get(i).setAttribute("href", "resources/SB_SN.png");
         else if (IS && OS) imageMap.get(i).setAttribute("href", "resources/empty.png"); // ?
-        else if (IS && OW) imageMap.get(i).setAttribute("href", "resources/SB_SW_1.png");
-        else if (IS && OE) imageMap.get(i).setAttribute("href", "resources/SB_SE_1.png");
+        else if (IS && OW) imageMap.get(i).setAttribute("href", "resources/SB_SW.png");
+        else if (IS && OE) imageMap.get(i).setAttribute("href", "resources/SB_SE.png");
 
-        else if (IW && ON) imageMap.get(i).setAttribute("href", "resources/SB_WN_1.png");
-        else if (IW && OS) imageMap.get(i).setAttribute("href", "resources/SB_WS_1.png");
+        else if (IW && ON) imageMap.get(i).setAttribute("href", "resources/SB_WN.png");
+        else if (IW && OS) imageMap.get(i).setAttribute("href", "resources/SB_WS.png");
         else if (IW && OW) imageMap.get(i).setAttribute("href", "resources/empty.png"); // ?
-        else if (IW && OE) imageMap.get(i).setAttribute("href", "resources/SB_WE_1.png");
+        else if (IW && OE) imageMap.get(i).setAttribute("href", "resources/SB_WE.png");
 
-        else if (IE && ON) imageMap.get(i).setAttribute("href", "resources/SB_EN_1.png");
-        else if (IE && OS) imageMap.get(i).setAttribute("href", "resources/SB_ES_1.png");
-        else if (IE && OW) imageMap.get(i).setAttribute("href", "resources/SB_EW_1.png");
+        else if (IE && ON) imageMap.get(i).setAttribute("href", "resources/SB_EN.png");
+        else if (IE && OS) imageMap.get(i).setAttribute("href", "resources/SB_ES.png");
+        else if (IE && OW) imageMap.get(i).setAttribute("href", "resources/SB_EW.png");
         else if (IE && OE) imageMap.get(i).setAttribute("href", "resources/empty.png"); // ?
 
-        else if (ON) imageMap.get(i).setAttribute("href", "resources/SB_SN_1.png");
-        else if (OS) imageMap.get(i).setAttribute("href", "resources/SB_NS_1.png");
-        else if (OW) imageMap.get(i).setAttribute("href", "resources/SB_EW_1.png");
-        else if (OE) imageMap.get(i).setAttribute("href", "resources/SB_WE_1.png");
+        else if (ON) imageMap.get(i).setAttribute("href", "resources/SB_SN.png");
+        else if (OS) imageMap.get(i).setAttribute("href", "resources/SB_NS.png");
+        else if (OW) imageMap.get(i).setAttribute("href", "resources/SB_EW.png");
+        else if (OE) imageMap.get(i).setAttribute("href", "resources/SB_WE.png");
 
         else if (sb[i].e == "SB_TI_N4") imageMap.get(i).setAttribute("href", "resources/SB_TI_N4.png");
         else if (sb[i].e == "SB_TI_S4") imageMap.get(i).setAttribute("href", "resources/SB_TI_S4.png");
@@ -93,6 +93,16 @@
         else if (sb[i].e == "SB_TO_S4") imageMap.get(i).setAttribute("href", "resources/SB_TO_S4.png");
         else if (sb[i].e == "SB_TO_W4") imageMap.get(i).setAttribute("href", "resources/SB_TO_W4.png");
         else if (sb[i].e == "SB_TO_E4") imageMap.get(i).setAttribute("href", "resources/SB_TO_E4.png");
+
+        else if (sb[i].e == "SB_TI_N6") imageMap.get(i).setAttribute("href", "resources/SB_TI_N6.png");
+        else if (sb[i].e == "SB_TI_S6") imageMap.get(i).setAttribute("href", "resources/SB_TI_S6.png");
+        else if (sb[i].e == "SB_TI_W6") imageMap.get(i).setAttribute("href", "resources/SB_TI_W6.png");
+        else if (sb[i].e == "SB_TI_E6") imageMap.get(i).setAttribute("href", "resources/SB_TI_E6.png");
+
+        else if (sb[i].e == "SB_TO_N6") imageMap.get(i).setAttribute("href", "resources/SB_TO_N6.png");
+        else if (sb[i].e == "SB_TO_S6") imageMap.get(i).setAttribute("href", "resources/SB_TO_S6.png");
+        else if (sb[i].e == "SB_TO_W6") imageMap.get(i).setAttribute("href", "resources/SB_TO_W6.png");
+        else if (sb[i].e == "SB_TO_E6") imageMap.get(i).setAttribute("href", "resources/SB_TO_E6.png");
 
         else imageMap.get(i).setAttribute("href", "resources/empty.png");
       }
