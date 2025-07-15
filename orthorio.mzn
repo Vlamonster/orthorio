@@ -9,12 +9,13 @@ int: WIDTH;
 int: AGENTS;
 int: NODES = HEIGHT * WIDTH;
 int: WALLS = sum(walls);
+bool: TUNNEL_4;
+bool: TUNNEL_6;
 
 array[1..AGENTS, Marker] of Node: path;
 array[1..HEIGHT, 1..WIDTH] of 0..1: walls;
 array[1..NODES] of 0..AGENTS: starts = [sum (a in 1..AGENTS) (a * (path(a, Start) == n)) | n in 1..NODES];
 array[1..NODES] of 0..AGENTS:   ends = [sum (a in 1..AGENTS) (a * (path(a,   End) == n)) | n in 1..NODES];
-
 
 % ----------------------
 %      Datatypes
@@ -28,14 +29,22 @@ enum SB = {
   SB_E,
   SB_S,
   SB_W,
-  SB_TI_N,
-  SB_TI_E,
-  SB_TI_S,
-  SB_TI_W,
-  SB_TO_N,
-  SB_TO_E,
-  SB_TO_S,
-  SB_TO_W
+  SB_TI_N4,
+  SB_TI_N6,
+  SB_TI_E4,
+  SB_TI_E6,
+  SB_TI_S4,
+  SB_TI_S6,
+  SB_TI_W4,
+  SB_TI_W6,
+  SB_TO_N4,
+  SB_TO_N6,
+  SB_TO_E4,
+  SB_TO_E6,
+  SB_TO_S4,
+  SB_TO_S6,
+  SB_TO_W4,
+  SB_TO_W6
 };
 
 % A Start or End marker.
@@ -120,6 +129,9 @@ constraint forall (a in 1..AGENTS, m in Marker) (
 
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (sb(y, x) == SB_Wall <-> walls[y, x] == 1);
 
+constraint forall (n in 1..NODES) (if not TUNNEL_4 then sb[n] in SB diff {SB_TI_N4, SB_TI_S4, SB_TI_W4, SB_TI_E4, SB_TO_N4, SB_TO_S4, SB_TO_W4, SB_TO_E4} endif);
+constraint forall (n in 1..NODES) (if not TUNNEL_6 then sb[n] in SB diff {SB_TI_N6, SB_TI_S6, SB_TI_W6, SB_TI_E6, SB_TO_N6, SB_TO_S6, SB_TO_W6, SB_TO_E6} endif);
+
 % ----------------------
 % Channeling Constraints
 % ----------------------
@@ -137,69 +149,129 @@ constraint forall(y in 1..HEIGHT, x in 1..WIDTH where ends(y,x) = 0)
      |enum2int(   SB_S), y + 1      , x
      |enum2int(   SB_W), y          , x - 1
      |enum2int(   SB_E), y          , x + 1
-     |enum2int(SB_TO_N), y - 1      , x
-     |enum2int(SB_TO_S), y + 1      , x
-     |enum2int(SB_TO_W), y          , x - 1
-     |enum2int(SB_TO_E), y          , x + 1
-     |enum2int(SB_TI_N), y - 2      , x
-     |enum2int(SB_TI_N), y - 3      , x
-     |enum2int(SB_TI_N), y - 4      , x
-     |enum2int(SB_TI_N), y - 5      , x
-     |enum2int(SB_TI_S), y + 2      , x
-     |enum2int(SB_TI_S), y + 3      , x
-     |enum2int(SB_TI_S), y + 4      , x
-     |enum2int(SB_TI_S), y + 5      , x
-     |enum2int(SB_TI_W), y          , x - 2
-     |enum2int(SB_TI_W), y          , x - 3
-     |enum2int(SB_TI_W), y          , x - 4
-     |enum2int(SB_TI_W), y          , x - 5
-     |enum2int(SB_TI_E), y          , x + 2
-     |enum2int(SB_TI_E), y          , x + 3
-     |enum2int(SB_TI_E), y          , x + 4
-     |enum2int(SB_TI_E), y          , x + 5|]));
+     |enum2int(SB_TI_N4), y - 2      , x
+     |enum2int(SB_TI_N4), y - 3      , x
+     |enum2int(SB_TI_N4), y - 4      , x
+     |enum2int(SB_TI_N4), y - 5      , x
+     |enum2int(SB_TI_S4), y + 2      , x
+     |enum2int(SB_TI_S4), y + 3      , x
+     |enum2int(SB_TI_S4), y + 4      , x
+     |enum2int(SB_TI_S4), y + 5      , x
+     |enum2int(SB_TI_W4), y          , x - 2
+     |enum2int(SB_TI_W4), y          , x - 3
+     |enum2int(SB_TI_W4), y          , x - 4
+     |enum2int(SB_TI_W4), y          , x - 5
+     |enum2int(SB_TI_E4), y          , x + 2
+     |enum2int(SB_TI_E4), y          , x + 3
+     |enum2int(SB_TI_E4), y          , x + 4
+     |enum2int(SB_TI_E4), y          , x + 5
+     |enum2int(SB_TO_N4), y - 1      , x
+     |enum2int(SB_TO_S4), y + 1      , x
+     |enum2int(SB_TO_W4), y          , x - 1
+     |enum2int(SB_TO_E4), y          , x + 1
+     |enum2int(SB_TI_N6), y - 2      , x
+     |enum2int(SB_TI_N6), y - 3      , x
+     |enum2int(SB_TI_N6), y - 4      , x
+     |enum2int(SB_TI_N6), y - 5      , x
+     |enum2int(SB_TI_N6), y - 6      , x
+     |enum2int(SB_TI_N6), y - 7      , x
+     |enum2int(SB_TI_S6), y + 2      , x
+     |enum2int(SB_TI_S6), y + 3      , x
+     |enum2int(SB_TI_S6), y + 4      , x
+     |enum2int(SB_TI_S6), y + 5      , x
+     |enum2int(SB_TI_S6), y + 6      , x
+     |enum2int(SB_TI_S6), y + 7      , x
+     |enum2int(SB_TI_W6), y          , x - 2
+     |enum2int(SB_TI_W6), y          , x - 3
+     |enum2int(SB_TI_W6), y          , x - 4
+     |enum2int(SB_TI_W6), y          , x - 5
+     |enum2int(SB_TI_W6), y          , x - 6
+     |enum2int(SB_TI_W6), y          , x - 7
+     |enum2int(SB_TI_E6), y          , x + 2
+     |enum2int(SB_TI_E6), y          , x + 3
+     |enum2int(SB_TI_E6), y          , x + 4
+     |enum2int(SB_TI_E6), y          , x + 5
+     |enum2int(SB_TI_E6), y          , x + 6
+     |enum2int(SB_TI_E6), y          , x + 7
+     |enum2int(SB_TO_N6), y - 1      , x
+     |enum2int(SB_TO_S6), y + 1      , x
+     |enum2int(SB_TO_W6), y          , x - 1
+     |enum2int(SB_TO_E6), y          , x + 1|]));
 
 % Enforce belt to belt transitions are valid.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0)
   (table(
     [enum2int(sb(y, x)), enum2int(sb[next(y, x)])],
-    [|enum2int(SB_None), enum2int(SB_None)
-     |enum2int(SB_Wall), enum2int(SB_Wall)
-     |enum2int(SB_TI_N), enum2int(SB_TO_N)
-     |enum2int(SB_TI_S), enum2int(SB_TO_S)
-     |enum2int(SB_TI_W), enum2int(SB_TO_W)
-     |enum2int(SB_TI_E), enum2int(SB_TO_E)
-     |enum2int(   SB_N), enum2int(   SB_N)
-     |enum2int(   SB_N), enum2int(   SB_W)
-     |enum2int(   SB_N), enum2int(   SB_E)
-     |enum2int(   SB_N), enum2int(SB_TI_N)
-     |enum2int(   SB_S), enum2int(   SB_S)
-     |enum2int(   SB_S), enum2int(   SB_W)
-     |enum2int(   SB_S), enum2int(   SB_E)
-     |enum2int(   SB_S), enum2int(SB_TI_S)
-     |enum2int(   SB_W), enum2int(   SB_N)
-     |enum2int(   SB_W), enum2int(   SB_S)
-     |enum2int(   SB_W), enum2int(   SB_W)
-     |enum2int(   SB_W), enum2int(SB_TI_W)
-     |enum2int(   SB_E), enum2int(   SB_N)
-     |enum2int(   SB_E), enum2int(   SB_S)
-     |enum2int(   SB_E), enum2int(   SB_E)
-     |enum2int(   SB_E), enum2int(SB_TI_E)
-     |enum2int(SB_TO_N), enum2int(   SB_N)
-     |enum2int(SB_TO_N), enum2int(   SB_W)
-     |enum2int(SB_TO_N), enum2int(   SB_E)
-     |enum2int(SB_TO_N), enum2int(SB_TI_N)
-     |enum2int(SB_TO_S), enum2int(   SB_S)
-     |enum2int(SB_TO_S), enum2int(   SB_W)
-     |enum2int(SB_TO_S), enum2int(   SB_E)
-     |enum2int(SB_TO_S), enum2int(SB_TI_S)
-     |enum2int(SB_TO_W), enum2int(   SB_N)
-     |enum2int(SB_TO_W), enum2int(   SB_S)
-     |enum2int(SB_TO_W), enum2int(   SB_W)
-     |enum2int(SB_TO_W), enum2int(SB_TI_W)
-     |enum2int(SB_TO_E), enum2int(   SB_N)
-     |enum2int(SB_TO_E), enum2int(   SB_S)
-     |enum2int(SB_TO_E), enum2int(   SB_E)
-     |enum2int(SB_TO_E), enum2int(SB_TI_E)|]));
+    [|enum2int( SB_None), enum2int( SB_None)
+     |enum2int( SB_Wall), enum2int( SB_Wall)
+     |enum2int(    SB_N), enum2int(    SB_N)
+     |enum2int(    SB_N), enum2int(    SB_W)
+     |enum2int(    SB_N), enum2int(    SB_E)
+     |enum2int(    SB_N), enum2int(SB_TI_N4)
+     |enum2int(    SB_N), enum2int(SB_TI_N6)
+     |enum2int(    SB_S), enum2int(    SB_S)
+     |enum2int(    SB_S), enum2int(    SB_W)
+     |enum2int(    SB_S), enum2int(    SB_E)
+     |enum2int(    SB_S), enum2int(SB_TI_S4)
+     |enum2int(    SB_S), enum2int(SB_TI_S6)
+     |enum2int(    SB_W), enum2int(    SB_N)
+     |enum2int(    SB_W), enum2int(    SB_S)
+     |enum2int(    SB_W), enum2int(    SB_W)
+     |enum2int(    SB_W), enum2int(SB_TI_W4)
+     |enum2int(    SB_W), enum2int(SB_TI_W6)
+     |enum2int(    SB_E), enum2int(    SB_N)
+     |enum2int(    SB_E), enum2int(    SB_S)
+     |enum2int(    SB_E), enum2int(    SB_E)
+     |enum2int(    SB_E), enum2int(SB_TI_E4)
+     |enum2int(    SB_E), enum2int(SB_TI_E6)
+     |enum2int(SB_TI_N4), enum2int(SB_TO_N4)
+     |enum2int(SB_TI_S4), enum2int(SB_TO_S4)
+     |enum2int(SB_TI_W4), enum2int(SB_TO_W4)
+     |enum2int(SB_TI_E4), enum2int(SB_TO_E4)
+     |enum2int(SB_TO_N4), enum2int(    SB_N)
+     |enum2int(SB_TO_N4), enum2int(    SB_W)
+     |enum2int(SB_TO_N4), enum2int(    SB_E)
+     |enum2int(SB_TO_N4), enum2int(SB_TI_N4)
+     |enum2int(SB_TO_N4), enum2int(SB_TI_N6)
+     |enum2int(SB_TO_S4), enum2int(    SB_S)
+     |enum2int(SB_TO_S4), enum2int(    SB_W)
+     |enum2int(SB_TO_S4), enum2int(    SB_E)
+     |enum2int(SB_TO_S4), enum2int(SB_TI_S4)
+     |enum2int(SB_TO_S4), enum2int(SB_TI_S6)
+     |enum2int(SB_TO_W4), enum2int(    SB_N)
+     |enum2int(SB_TO_W4), enum2int(    SB_S)
+     |enum2int(SB_TO_W4), enum2int(    SB_W)
+     |enum2int(SB_TO_W4), enum2int(SB_TI_W4)
+     |enum2int(SB_TO_W4), enum2int(SB_TI_W6)
+     |enum2int(SB_TO_E4), enum2int(    SB_N)
+     |enum2int(SB_TO_E4), enum2int(    SB_S)
+     |enum2int(SB_TO_E4), enum2int(    SB_E)
+     |enum2int(SB_TO_E4), enum2int(SB_TI_E4)
+     |enum2int(SB_TO_E4), enum2int(SB_TI_E6)
+     |enum2int(SB_TI_N6), enum2int(SB_TO_N6)
+     |enum2int(SB_TI_S6), enum2int(SB_TO_S6)
+     |enum2int(SB_TI_W6), enum2int(SB_TO_W6)
+     |enum2int(SB_TI_E6), enum2int(SB_TO_E6)
+     |enum2int(SB_TO_N6), enum2int(    SB_N)
+     |enum2int(SB_TO_N6), enum2int(    SB_W)
+     |enum2int(SB_TO_N6), enum2int(    SB_E)
+     |enum2int(SB_TO_N6), enum2int(SB_TI_N4)
+     |enum2int(SB_TO_N6), enum2int(SB_TI_N6)
+     |enum2int(SB_TO_S6), enum2int(    SB_S)
+     |enum2int(SB_TO_S6), enum2int(    SB_W)
+     |enum2int(SB_TO_S6), enum2int(    SB_E)
+     |enum2int(SB_TO_S6), enum2int(SB_TI_S4)
+     |enum2int(SB_TO_S6), enum2int(SB_TI_S6)
+     |enum2int(SB_TO_W6), enum2int(    SB_N)
+     |enum2int(SB_TO_W6), enum2int(    SB_S)
+     |enum2int(SB_TO_W6), enum2int(    SB_W)
+     |enum2int(SB_TO_W6), enum2int(SB_TI_W4)
+     |enum2int(SB_TO_W6), enum2int(SB_TI_W6)
+     |enum2int(SB_TO_E6), enum2int(    SB_N)
+     |enum2int(SB_TO_E6), enum2int(    SB_S)
+     |enum2int(SB_TO_E6), enum2int(    SB_E)
+     |enum2int(SB_TO_E6), enum2int(SB_TI_E4)
+     |enum2int(SB_TO_E6), enum2int(SB_TI_E6)|]));
 
 % ----------------------
 %   Agent Constraints
@@ -224,27 +296,53 @@ constraint forall (n in 1..NODES where ends[n] != 0) (sba[n] == ends[n]);
 % Disallow nested tunnels in the same axis.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
   let {
-    set of SB: notNS = SB diff {SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S};
-    set of SB: notWE = SB diff {SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W};
+    set of SB: notNS4 = SB diff {SB_TI_N4, SB_TO_N4, SB_TI_S4, SB_TO_S4};
+    set of SB: notWE4 = SB diff {SB_TI_E4, SB_TO_E4, SB_TI_W4, SB_TO_W4};
+    set of SB: notNS6 = SB diff {SB_TI_N6, SB_TO_N6, SB_TI_S6, SB_TO_S6};
+    set of SB: notWE6 = SB diff {SB_TI_E6, SB_TO_E6, SB_TI_W6, SB_TO_W6};
   } in
-  if     sb(y, x) == SB_TI_N then forall (yy in nexty(y, x) + 1..y - 1) (sb(yy,  x) in notNS)
-  elseif sb(y, x) == SB_TI_S then forall (yy in y + 1..nexty(y, x) - 1) (sb(yy,  x) in notNS)
-  elseif sb(y, x) == SB_TI_W then forall (xx in nextx(y, x) + 1..x - 1) (sb( y, xx) in notWE)
-  elseif sb(y, x) == SB_TI_E then forall (xx in x + 1..nextx(y, x) - 1) (sb( y, xx) in notWE) endif);
+  if     sb(y, x) == SB_TI_N4 then forall (yy in nexty(y, x) + 1..y - 1) (sb(yy,  x) in notNS4)
+  elseif sb(y, x) == SB_TI_S4 then forall (yy in y + 1..nexty(y, x) - 1) (sb(yy,  x) in notNS4)
+  elseif sb(y, x) == SB_TI_W4 then forall (xx in nextx(y, x) + 1..x - 1) (sb( y, xx) in notWE4)
+  elseif sb(y, x) == SB_TI_E4 then forall (xx in x + 1..nextx(y, x) - 1) (sb( y, xx) in notWE4)
+  elseif sb(y, x) == SB_TI_N6 then forall (yy in nexty(y, x) + 1..y - 1) (sb(yy,  x) in notNS6)
+  elseif sb(y, x) == SB_TI_S6 then forall (yy in y + 1..nexty(y, x) - 1) (sb(yy,  x) in notNS6)
+  elseif sb(y, x) == SB_TI_W6 then forall (xx in nextx(y, x) + 1..x - 1) (sb( y, xx) in notWE6)
+  elseif sb(y, x) == SB_TI_E6 then forall (xx in x + 1..nextx(y, x) - 1) (sb( y, xx) in notWE6) endif);
 
 % Tunnel entrances are followed by a non-empty tile.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
-  if     sb(y, x) == SB_TI_N then 1 < y      /\ sb(y - 1, x    ) in SB diff {SB_None, SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S}
-  elseif sb(y, x) == SB_TI_S then y < HEIGHT /\ sb(y + 1, x    ) in SB diff {SB_None, SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S}
-  elseif sb(y, x) == SB_TI_W then 1 < x      /\ sb(y    , x - 1) in SB diff {SB_None, SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W}
-  elseif sb(y, x) == SB_TI_E then x < WIDTH  /\ sb(y    , x + 1) in SB diff {SB_None, SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W} endif);
+  let {
+    set of SB: notNS4 = SB diff {SB_None, SB_TI_N4, SB_TO_N4, SB_TI_S4, SB_TO_S4};
+    set of SB: notWE4 = SB diff {SB_None, SB_TI_E4, SB_TO_E4, SB_TI_W4, SB_TO_W4};
+    set of SB: notNS6 = SB diff {SB_None, SB_TI_N6, SB_TO_N6, SB_TI_S6, SB_TO_S6};
+    set of SB: notWE6 = SB diff {SB_None, SB_TI_E6, SB_TO_E6, SB_TI_W6, SB_TO_W6};
+  } in
+  if     sb(y, x) == SB_TI_N4 then sb(y - 1, x    ) in notNS4
+  elseif sb(y, x) == SB_TI_S4 then sb(y + 1, x    ) in notNS4
+  elseif sb(y, x) == SB_TI_W4 then sb(y    , x - 1) in notWE4
+  elseif sb(y, x) == SB_TI_E4 then sb(y    , x + 1) in notWE4
+  elseif sb(y, x) == SB_TI_N6 then sb(y - 1, x    ) in notNS6
+  elseif sb(y, x) == SB_TI_S6 then sb(y + 1, x    ) in notNS6
+  elseif sb(y, x) == SB_TI_W6 then sb(y    , x - 1) in notWE6
+  elseif sb(y, x) == SB_TI_E6 then sb(y    , x + 1) in notWE6 endif);
 
 % Tunnel exits are preceded by a non-empty tile.
 constraint forall (y in 1..HEIGHT, x in 1..WIDTH) (
-  if     sb(y, x) == SB_TO_S then 1 < y      /\ sb(y - 1, x    ) in SB diff {SB_None, SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S}
-  elseif sb(y, x) == SB_TO_N then y < HEIGHT /\ sb(y + 1, x    ) in SB diff {SB_None, SB_TI_N, SB_TO_N, SB_TI_S, SB_TO_S}
-  elseif sb(y, x) == SB_TO_E then 1 < x      /\ sb(y    , x - 1) in SB diff {SB_None, SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W}
-  elseif sb(y, x) == SB_TO_W then x < WIDTH  /\ sb(y    , x + 1) in SB diff {SB_None, SB_TI_E, SB_TO_E, SB_TI_W, SB_TO_W} endif);
+  let {
+    set of SB: notNS4 = SB diff {SB_None, SB_TI_N4, SB_TO_N4, SB_TI_S4, SB_TO_S4};
+    set of SB: notWE4 = SB diff {SB_None, SB_TI_E4, SB_TO_E4, SB_TI_W4, SB_TO_W4};
+    set of SB: notNS6 = SB diff {SB_None, SB_TI_N6, SB_TO_N6, SB_TI_S6, SB_TO_S6};
+    set of SB: notWE6 = SB diff {SB_None, SB_TI_E6, SB_TO_E6, SB_TI_W6, SB_TO_W6};
+  } in
+  if     sb(y, x) == SB_TO_S4 then sb(y - 1, x    ) in notNS4
+  elseif sb(y, x) == SB_TO_N4 then sb(y + 1, x    ) in notNS4
+  elseif sb(y, x) == SB_TO_E4 then sb(y    , x - 1) in notWE4
+  elseif sb(y, x) == SB_TO_W4 then sb(y    , x + 1) in notWE4
+  elseif sb(y, x) == SB_TO_S6 then sb(y - 1, x    ) in notNS6
+  elseif sb(y, x) == SB_TO_N6 then sb(y + 1, x    ) in notNS6
+  elseif sb(y, x) == SB_TO_E6 then sb(y    , x - 1) in notWE6
+  elseif sb(y, x) == SB_TO_W6 then sb(y    , x + 1) in notWE6 endif);
 
 % ----------------------
 % Subcircuit Constraints
@@ -293,16 +391,6 @@ constraint forall(y in 1..HEIGHT-1, x in 1..WIDTH-1) (
        sb(y + 1, x    ), sb(y + 1, x + 1)][i] != disallowed_shapes[p, i])));
 
 % ----------------------
-% Redundant Constraints
-% ----------------------
-
-constraint forall (y in 1..HEIGHT, x in 1..WIDTH where ends(y, x) == 0) (
-  if     y == 1      then sb(y, x) in SB diff {SB_N, SB_TO_S, SB_TI_N}
-  elseif y == HEIGHT then sb(y, x) in SB diff {SB_S, SB_TO_N, SB_TI_S}
-  elseif x == 1      then sb(y, x) in SB diff {SB_W, SB_TO_E, SB_TI_W}
-  elseif x == WIDTH  then sb(y, x) in SB diff {SB_E, SB_TO_W, SB_TI_E} endif);
-
-% ----------------------
 %         Goal
 % ----------------------
 
@@ -320,10 +408,10 @@ function string: show_sb(int: y, int: x) =
     bool: OS = fix(sb[index(y, x)]) == SB_S;
     bool: OW = fix(sb[index(y, x)]) == SB_W;
     bool: OE = fix(sb[index(y, x)]) == SB_E;
-    bool: IN = 1 < y      /\ (fix(sb[index(y - 1, x    )]) == SB_S \/ fix(sb[index(y - 1, x    )]) == SB_TO_S);
-    bool: IS = y < HEIGHT /\ (fix(sb[index(y + 1, x    )]) == SB_N \/ fix(sb[index(y + 1, x    )]) == SB_TO_N);
-    bool: IW = 1 < x      /\ (fix(sb[index(y    , x - 1)]) == SB_E \/ fix(sb[index(y    , x - 1)]) == SB_TO_E);
-    bool: IE = x < WIDTH  /\ (fix(sb[index(y    , x + 1)]) == SB_W \/ fix(sb[index(y    , x + 1)]) == SB_TO_W);
+    bool: IN = 1 < y      /\ (fix(sb[index(y - 1, x    )]) in {SB_S, SB_TO_S4, SB_TO_S6});
+    bool: IS = y < HEIGHT /\ (fix(sb[index(y + 1, x    )]) in {SB_N, SB_TO_N4, SB_TO_N6});
+    bool: IW = 1 < x      /\ (fix(sb[index(y    , x - 1)]) in {SB_E, SB_TO_E4, SB_TO_E6});
+    bool: IE = x < WIDTH  /\ (fix(sb[index(y    , x + 1)]) in {SB_W, SB_TO_W4, SB_TO_W6});
   } in
   
   if     fix(sb[index(y, x)]) == SB_None then " "
@@ -354,15 +442,11 @@ function string: show_sb(int: y, int: x) =
   elseif OW then "─"
   elseif OE then "─"
 
-  elseif fix(sb[index(y, x)]) == SB_TO_N then "║"
-  elseif fix(sb[index(y, x)]) == SB_TO_S then "║"
-  elseif fix(sb[index(y, x)]) == SB_TO_W then "═"
-  elseif fix(sb[index(y, x)]) == SB_TO_E then "═"
+  elseif fix(sb[index(y, x)]) in {SB_TI_N4, SB_TO_N4, SB_TI_S4, SB_TO_S4} then "║"
+  elseif fix(sb[index(y, x)]) in {SB_TI_W4, SB_TO_W4, SB_TI_E4, SB_TO_E4} then "═"
 
-  elseif fix(sb[index(y, x)]) == SB_TI_N then "║"
-  elseif fix(sb[index(y, x)]) == SB_TI_S then "║"
-  elseif fix(sb[index(y, x)]) == SB_TI_W then "═"
-  elseif fix(sb[index(y, x)]) == SB_TI_E then "═"
+  elseif fix(sb[index(y, x)]) in {SB_TI_N6, SB_TO_N6, SB_TI_S6, SB_TO_S6} then "║"
+  elseif fix(sb[index(y, x)]) in {SB_TI_W6, SB_TO_W6, SB_TI_E6, SB_TO_E6} then "═̈"
 
   else "?"
   
