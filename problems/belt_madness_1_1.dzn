@@ -1,6 +1,8 @@
 HEIGHT = 13;
 WIDTH = 11;
 AGENTS = 4;
+TUNNEL_4 = true;
+TUNNEL_6 = false;
 
 path = array2d(1..AGENTS, Marker,
   [|(y: 5, x: 1, d: ">"), (y: 9, x: 11, d: ">")
